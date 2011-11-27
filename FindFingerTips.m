@@ -1,0 +1,2 @@
+function [points] = FindFingerTips(v)
+

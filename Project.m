@@ -27,8 +27,9 @@ disp('Bounding lines are these:');
 data
 
 %TODO - observe video/series of input images and analyze hand signals
-%Respond by giving us the x,y (or y,x) coordinant pairs for the fingertips
+%Respond by giving us the (x,y) coordinant pairs for the fingertips
 %as they touch the keyboard
+finger_points = FindFingerTips();
 
 %TODO - match the finger tip position with a key by comparing the point to
 %the slope-intercept line equation
@@ -37,4 +38,4 @@ data
 
 %TODO - report by Thursday classtime.
 
-disp('Tad-Da!');
+disp('Ta-Da!');
