@@ -7,12 +7,12 @@ disp('The Virtual Keyboard - Burkart, Chima, Daines');
 %and execute all code for the Computer Vision final project.
 
 %get raw bg without piano keyboard
-bg = imread('bg.jpg');
+bg = imread('test_images/bg.jpg');
 %imshow(bg);
 %pause;
 
 %get bg image with piano keyboard
-bbg = imread('bbg.jpg');
+bbg = imread('test_images/bbg.jpg');
 %imshow(bbg);
 %pause;
 
