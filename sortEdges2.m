@@ -232,7 +232,7 @@ sortedlist = sortedlist(1:r,1:2);
 %si2 = size(sortedlist)
 
 disp('The boundary pixels are found and sorted. Press ENTER.');
-pause;
+%pause;
 
 end
 

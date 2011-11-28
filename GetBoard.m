@@ -1,4 +1,4 @@
-function [keys] = GetBoard( bgimage, boardim )
+function [keys, keyLines] = GetBoard( bgimage, boardim )
 %GETBOARD Locates the paper keyboard and keys
 %   Takes in a bg image without the keyboard
 %   followed by an image with the keyboard
@@ -184,7 +184,7 @@ end
 
 hold off
 disp('The corner clusters have been identified. Press ENTER.');
-pause;
+%pause;
 
 no = size(cand);
 
@@ -297,7 +297,7 @@ plot(corners(3,1),corners(3,2),'b*');
 plot(corners(4,1),corners(4,2),'b*');
 hold off
 disp('Corner pixels have been found. Press ENTER.');
-pause;
+%pause;
 
 %TODO - now that we have the corners of the board, we can determine the
 %regions corresponding to each individual key
@@ -343,6 +343,21 @@ b4 = -ord(3,2) - temp(4)*ord(3,1);
 
 %format bank
 lines = [temp(1), b1; temp(2),b2; temp(3),b3; temp(4),b4]
+
+temp = [];
+b = [];
+keyPointsTop = [];
+keyPointsBottom = [];
+
+for j=1:6
+    keyPointsTop = [keyPointsTop; ord(2,:)+j*(ord(3,:)-ord(2,:))/7];
+    keyPointsBottom = [keyPointsBottom; ord(1,:)+j*(ord(4, :)-ord(1,:))/7];
+    temp = [temp; ((-keyPointsTop(j,2)-(-keyPointsBottom(j,2)))/(keyPointsTop(j,1))-keyPointsBottom(j,1))];
+    b = [b; -keyPointsTop(j,2)-temp(j)*keyPointsBottom(j,1)];
+end
+
+%format bank
+keyLines = [temp(1), b(1); temp(2),b(2); temp(3),b(3); temp(4),b(4); temp(5),b(5); temp(6),b(6)];
 
 %TODO - write equation for each verticle line
 
