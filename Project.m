@@ -18,17 +18,26 @@ bbg = imread('test_images/bbg.jpg');
 
 %locate individual keys:
 %(slope, y-intercept forms of bounding lines)
-data = GetBoard(bg, bbg);
+global data keyLines;
+
+ScanSoundFiles;
+
+[data, keyLines] = GetBoard(bg, bbg);
 %NOTE*** - the list will be m,b pairs. The first pair will represent the top
 %of the keyboard, and the second pair will represent the bottom. The
 %subsequent (eight) pairs will distinguish the keys.
 
 disp('Bounding lines are these:');
-data
 
+disp('The lines representing the piano key boundaries are these:');
 %TODO - observe video/series of input images and analyze hand signals
 %Respond by giving us the x,y (or y,x) coordinant pairs for the fingertips
 %as they touch the keyboard
+
+points = [256,256; 300, 330; 430, 330];
+keys = keyFromPoints(points)
+
+PlayNotes(keys);
 
 %TODO - match the finger tip position with a key by comparing the point to
 %the slope-intercept line equation
