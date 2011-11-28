@@ -31,8 +31,9 @@ disp('Bounding lines are these:');
 
 disp('The lines representing the piano key boundaries are these:');
 %TODO - observe video/series of input images and analyze hand signals
-%Respond by giving us the x,y (or y,x) coordinant pairs for the fingertips
+%Respond by giving us the (x,y) coordinant pairs for the fingertips
 %as they touch the keyboard
+finger_points = FindFingerTips();
 
 points = [256,256; 300, 330; 430, 330];
 keys = keyFromPoints(points)
@@ -46,4 +47,4 @@ PlayNotes(keys);
 
 %TODO - report by Thursday classtime.
 
-disp('Tad-Da!');
+disp('Ta-Da!');
