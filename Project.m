@@ -39,6 +39,7 @@ end
 
 FS.Clear();
 iSightClose(iSight);
+pause;
 
 %locate individual keys:
 %(slope, y-intercept forms of bounding lines)
