@@ -31,15 +31,18 @@ yiq1 = rgb2ntsc(bgimage);
 yiq2 = rgb2ntsc(boardim);
 T = .05;
 
-for y=1:1:hei
-    for x=1:1:wid
-        if abs(yiq1(y,x,2)-yiq2(y,x,2)) + abs(yiq1(y,x,3)-yiq2(y,x,3)) > T
-            temp(y,x) = 1;
-        else
-            temp(y,x) = 0;
-        end
-    end
-end
+temp = abs(yiq1(:,:,2)-yiq2(:,:,2)) + abs(yiq1(:,:,3)-yiq2(:,:,3)) > T;
+% 
+% for y=1:1:hei
+%     for x=1:1:wid
+%         if abs(yiq1(y,x,2)-yiq2(y,x,2)) + abs(yiq1(y,x,3)-yiq2(y,x,3)) > T
+%             temp(y,x) = 1;
+%         else
+%             temp(y,x) = 0;
+%         end
+%     end
+% end
+
 imshow(temp);
 disp('showing yiq custom bg subtraction');
 pause;
@@ -56,18 +59,22 @@ end
 %select largest group
 most_members = max(loc);
 which_group = find(loc == most_members);
-[h,w] = size(diff);
-for y = 1:h
-    for x = 1:w
-        %select pixels from this group
-        if diff(y,x) == which_group
-            diff(y,x) = 1;
-        else
-            diff(y,x) = 0;
-        end
-    end
-end
+
+diff = (diff == which_group);
+% [h,w] = size(diff);
+% for y = 1:h
+%     for x = 1:w
+%         %select pixels from this group
+%         if diff(y,x) == which_group
+%             diff(y,x) = 1;
+%         else
+%             diff(y,x) = 0;
+%         end
+%     end
+% end
+
 imshow(diff);
+disp('paused');
 pause;
 
 %locate board using bg subtraction method 1:
@@ -159,7 +166,7 @@ for q = (k+1) : 1 : (c-k)
     %theta = acos(dot(p1,p3)/(sqrt(sum(p1.^2))+sqrt(sum(p3.^2))));
 
     %find corners within about 60 to 130 degrees (corners of board)
-    if (real(theta) < (130*(pi/180))) && (real(theta) > (50*(pi/180)))
+    if (real(theta) < (130*(pi/180))) && (real(theta) > (40*(pi/180)))
 
         %we have a corner
 
@@ -193,7 +200,7 @@ for q = 1:1:k
     %theta = acos(dot(p1,p3)/(sqrt(sum(p1.^2))+sqrt(sum(p3.^2))));
 
     %find corners within about 60 to 130 degrees (corners of board)
-    if (real(theta) < (130*(pi/180))) && (real(theta) > (50*(pi/180)))
+    if (real(theta) < (130*(pi/180))) && (real(theta) > (40*(pi/180)))
 
         %we have a corner
 
@@ -228,7 +235,7 @@ for q = c-k:1:c
     %theta = acos(dot(p1,p3)/(sqrt(sum(p1.^2))+sqrt(sum(p3.^2))));
 
     %find corners within about 60 to 130 degrees (corners of board)
-    if (real(theta) < (130*(pi/180))) && (real(theta) > (50*(pi/180)))
+    if (real(theta) < (130*(pi/180))) && (real(theta) > (40*(pi/180)))
 
         %we have a corner
 
@@ -454,10 +461,10 @@ ord2(4,1:2) = corners(find(corners(:,2) == order2(4)),1:2);
 
 
 %calculate y-intercept
-b1 = -ord(1,2) - temp(1)*ord(1,1);
-b2 = -ord(2,2) - temp(2)*ord(2,1);
-b3 = -ord(1,2) - temp(3)*ord(1,1);
-b4 = -ord(3,2) - temp(4)*ord(3,1);
+b1 = -ord(1,2) - temp(1)*ord(1,1)
+b2 = -ord(2,2) - temp(2)*ord(2,1)
+b3 = -ord(1,2) - temp(3)*ord(1,1)
+b4 = -ord(3,2) - temp(4)*ord(3,1)
 
 %format bank
 lines = [temp(1), b1; temp(2),b2; temp(3),b3; temp(4),b4]
