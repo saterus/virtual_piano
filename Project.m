@@ -44,7 +44,7 @@ ScanSoundFiles;
 %locate individual keys:
 %(slope, y-intercept forms of bounding lines)
 global data keyLines;
-%[data, keyLines] = GetBoard(bg, bbg);
+[data, keyLines, boardMask] = GetBoard(bg, bbg);
 
 % FS = stoploop({'Push to stop testing loop.'}) ;
 % while(~FS.Stop())
@@ -92,6 +92,7 @@ global img chan_diff chan_diff_mask;
 % iSightClose(iSight);
 
 HandMask(bbg, 'test_images/SampleDataDark/hand22.jpg');
+chan_diff_mask = chan_diff_mask & boardMask;
 finger_points = low5(chan_diff_mask);
 
 %points = [256,256; 300, 330; 430, 330];
