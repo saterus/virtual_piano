@@ -30,7 +30,11 @@ end
 diff = zeros(hei,wid);
 
 %set a threshold
-T = 40;
+T = mean2(abs(im1-im2));
+sigma = 2;
+G = fspecial('gaussian', 2*ceil(3*sigma)+1,sigma);
+im1 = imfilter(im1, G, 'replicate');
+im2 = imfilter(im2, G, 'replicate');
 
 %Perform subtraction with threshold
 for y=1:1:hei
@@ -44,11 +48,12 @@ for y=1:1:hei
 end
 
 %clean shape
+
 diff = bwmorph(diff, 'close');
 diff = bwmorph(diff, 'majority');
 diff = bwmorph(diff, 'hbreak',4);
 %diff = bwmorph(diff, 'thicken');
-
+diff = bwareaopen(diff,10000);
 %imshow(diff);
 %pause;
 
@@ -61,10 +66,11 @@ border = edge(diff, 'canny');
 %smooth edges of board??
 
 %make list of edge pixels
-list = regionprops(border,'pixellist');
+list = regionprops(border,'pixellist')
 
 %get ordered list of border pixels, clockwise
-olist = sortEdges2(border,list.PixelList);
+temp = list(1);
+olist = sortEdges2(border,temp.PixelList);
 
 %prepare a short list of corner candidates
 cand = [];
@@ -295,7 +301,6 @@ plot(corners(1,1),corners(1,2),'b*');
 plot(corners(2,1),corners(2,2),'b*');
 plot(corners(3,1),corners(3,2),'b*');
 plot(corners(4,1),corners(4,2),'b*');
-hold off
 disp('Corner pixels have been found. Press ENTER.');
 %pause;
 
@@ -358,6 +363,11 @@ end
 
 %format bank
 keyLines = [temp(1), b(1); temp(2),b(2); temp(3),b(3); temp(4),b(4); temp(5),b(5); temp(6),b(6)];
+
+for i=1:6
+    plot([keyPointsBottom(i,1), keyPointsTop(i,1)], [keyPointsBottom(i,2), keyPointsTop(i,2)]);
+end
+hold off
 
 %TODO - write equation for each verticle line
 
