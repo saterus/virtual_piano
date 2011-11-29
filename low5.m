@@ -17,7 +17,8 @@ im = hand;
 
 %get edges of board
 
-im = bwmorph(im, 'dilate');
+im = bwmorph(im, 'dilate',3);
+im = bwmorph(im,'close');
 border = edge(im, 'canny');
 
 
@@ -43,7 +44,7 @@ for i=1:size(list)
     end
 end
 
-border2 = bwareaopen(border2, max);
+border2 = bwareaopen(border2, max);figure;imshow(border2);disp('here');pause;
 list = regionprops(border2,'pixellist');
 olist = sortEdges2(border2,list.PixelList);
 
@@ -169,7 +170,7 @@ bins = [];
 
 avgs = [];
 
-max_samples = 9
+max_samples = 15
 
 nums = zeros(1:max_samples);
 
@@ -259,6 +260,14 @@ c5(1:nums(5),1:3) = bins(5,1:nums(5),1:3)
 c6(1:nums(6),1:3) = bins(6,1:nums(6),1:3)
 c7(1:nums(7),1:3) = bins(7,1:nums(7),1:3)
 c8(1:nums(8),1:3) = bins(8,1:nums(8),1:3)
+c9(1:nums(9),1:3) = bins(9,1:nums(9),1:3)
+c10(1:nums(10),1:3) = bins(10,1:nums(10),1:3)
+% c11(1:nums(11),1:3) = bins(11,1:nums(11),1:3)
+% c12(1:nums(12),1:3) = bins(12,1:nums(12),1:3)
+% c13(1:nums(13),1:3) = bins(13,1:nums(13),1:3)
+% c14(1:nums(14),1:3) = bins(14,1:nums(14),1:3)
+% c15(1:nums(15),1:3) = bins(15,1:nums(15),1:3)
+
 
 f1 = find(c1(:,3) == min(c1(:,3)))
 f2 = find(c2(:,3) == min(c2(:,3)))
@@ -268,6 +277,13 @@ f5 = find(c5(:,3) == min(c5(:,3)))
 f6 = find(c6(:,3) == min(c6(:,3)))
 f7 = find(c7(:,3) == min(c7(:,3)))
 f8 = find(c8(:,3) == min(c8(:,3)))
+f9 = find(c9(:,3) == min(c9(:,3)))
+f10 = find(c10(:,3) == min(c10(:,3)))
+% f11 = find(c11(:,3) == min(c11(:,3)))
+% f12 = find(c12(:,3) == min(c12(:,3)))
+% f13 = find(c13(:,3) == min(c13(:,3)))
+% f14 = find(c14(:,3) == min(c14(:,3)))
+% f15 = find(c15(:,3) == min(c15(:,3)))
 
 av1(1,1:2) = c1(f1(1),1:2);
 av2(1,1:2) = c2(f2(1),1:2);
@@ -277,8 +293,15 @@ av5(1,1:2) = c5(f5(1),1:2);
 av6(1,1:2) = c6(f6(1),1:2);
 av7(1,1:2) = c7(f7(1),1:2);
 av8(1,1:2) = c8(f8(1),1:2);
+av9(1,1:2) = c9(f9(1),1:2);
+av10(1,1:2) = c10(f10(1),1:2);
+% av11(1,1:2) = c11(f11(1),1:2);
+% av12(1,1:2) = c12(f12(1),1:2);
+% av13(1,1:2) = c13(f13(1),1:2);
+% av14(1,1:2) = c14(f14(1),1:2);
+% av15(1,1:2) = c15(f15(1),1:2);
 
-corners = [av1;av2;av3;av4;av5;av6;av7;av8]
+corners = [av1;av2;av3;av4;av5;av6;av7;av8;av9;av10]
 
 imshow(border);
 hold on
@@ -290,6 +313,13 @@ plot(corners(5,1),corners(5,2),'b*');
 plot(corners(6,1),corners(6,2),'b*');
 plot(corners(7,1),corners(7,2),'b*');
 plot(corners(8,1),corners(8,2),'b*');
+plot(corners(9,1),corners(9,2),'b*');
+plot(corners(10,1),corners(10,2),'b*');
+% plot(corners(11,1),corners(11,2),'b*');
+% plot(corners(12,1),corners(12,2),'b*');
+% plot(corners(13,1),corners(13,2),'b*');
+% plot(corners(14,1),corners(14,2),'b*');
+% plot(corners(15,1),corners(15,2),'b*');
 hold off
 disp('Corner pixels have been found. Press ENTER.');
 pause;

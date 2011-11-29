@@ -30,9 +30,9 @@ temp = zeros(hei,wid);
 yiq1 = rgb2ntsc(bgimage);
 yiq2 = rgb2ntsc(boardim);
 
-T = .07;
+T = .05;
 
-temp = abs(yiq1(:,:,1)-yiq2(:,:,1))*0.1 + abs(yiq1(:,:,2)-yiq2(:,:,2))*.95 + abs(yiq1(:,:,3)-yiq2(:,:,3))*.98 > T;
+temp = abs(yiq1(:,:,1)-yiq2(:,:,1))*0.3 + abs(yiq1(:,:,2)-yiq2(:,:,2))*.95 + abs(yiq1(:,:,3)-yiq2(:,:,3))*.98 > T;
 % 
 % for y=1:1:hei
 %     for x=1:1:wid
@@ -45,7 +45,7 @@ temp = abs(yiq1(:,:,1)-yiq2(:,:,1))*0.1 + abs(yiq1(:,:,2)-yiq2(:,:,2))*.95 + abs
 % end
 
 imshow(temp);
-% disp('showing yiq custom bg subtraction');
+disp('showing yiq custom bg subtraction');
 pause;
 
 [diff, num] = bwlabel(temp, 8);
@@ -112,7 +112,8 @@ diff = bwmorph(diff, 'hbreak',4);
 diff = bwareaopen(diff,10000);
 
 diff = imfilter(diff,fspecial('gaussian',10,18));
-boardMask = (diff - 1) * -1;
+figure; imshow(diff);pause;
+boardMask = diff; %(diff - 1) * -1;
 %imshow(diff);
 %pause;
 

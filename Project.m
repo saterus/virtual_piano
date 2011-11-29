@@ -6,13 +6,13 @@ disp('The Virtual Keyboard - Burkart, Chima, Daines');
 %and execute all code for the Computer Vision final project.
 
 %get raw bg without piano keyboard
-bg = imread('test_images/SampleDataDark/bg2.jpg');
+bg = imread('test_images/SampleDataGrey1/bg4.jpg');
 %bg = imread('Keith2.jpg');
 %imshow(bg);
 %pause;
 
 %get bg image with piano keyboard
-bbg = imread('test_images/SampleDataDark/kb2.jpg');
+bbg = imread('test_images/SampleDataGrey1/kb4.jpg');
 %bbg = imread('Keith1.jpg');
 %imshow(bbg);
 %pause;
@@ -91,9 +91,14 @@ global img chan_diff chan_diff_mask;
 % end
 % iSightClose(iSight);
 
-HandMask(bbg, 'test_images/SampleDataDark/hand22.jpg');
-chan_diff_mask = chan_diff_mask & boardMask;
+HandMask(bbg, 'test_images/SampleDataGrey1/hand34.jpg');
+dims = size(bbg);
+barmask = [zeros(100,dims(2));ones(dims(1)-100,dims(2))];
+chan_diff_mask = chan_diff_mask & barmask;
+figure;imshow(chan_diff_mask);pause;
 finger_points = low5(chan_diff_mask);
+
+finger_points = [finger_points(1,1) finger_points(1,2) ; finger_points(2,1) finger_points(2,2)];
 
 %points = [256,256; 300, 330; 430, 330];
 keys = keyFromPoints(finger_points)
