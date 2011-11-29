@@ -9,39 +9,89 @@ function [keys, keyLines] = GetBoard( bgimage, boardim )
 %   Returns the slope and y-intercept of each line
 %   where lines outline the keyboard and divide the keys
 
+
 %covert rgb to grey
 [h, w, d] = size(bgimage);
 if(d > 0)
-    %disp('is rgb');
+    disp('is rgb');
     im1 = double(rgb2gray(bgimage));
     im2 = double(rgb2gray(boardim));
 else
-    %disp('is not rgb');
+    disp('is not rgb');
     im1 = double(bgimage);
     im2 = double(boardim);
 end
 
-%locate board using bg subtraction method 1:
-
-%get size
 [hei, wid] = size(im1);
 
 %prepare a results image
 diff = zeros(hei,wid);
-
-%set a threshold
-T = 40;
-
-%Perform subtraction with threshold
+yiq1 = rgb2ntsc(bgimage);
+yiq2 = rgb2ntsc(boardim);
+T = .05;
 for y=1:1:hei
     for x=1:1:wid
-        if abs(im2(y,x)-im1(y,x))>T
+        if abs(yiq1(y,x,2)-yiq2(y,x,2)) + abs(yiq1(y,x,3)-yiq2(y,x,3)) > T
+            temp(y,x) = 1;
+        else
+            temp(y,x) = 0;
+        end
+    end
+end
+imshow(temp);
+disp('temp');
+pause;
+
+[diff, num] = bwlabel(temp, 8);
+%determine number of groups
+maxim = max(max(diff))
+
+for i = 1: 1 : maxim
+    %count members in each group
+    loc(i) = length(find(diff == i));
+end
+
+%select largest group
+most_members = max(loc)
+which_group = find(loc == most_members)
+[h,w] = size(diff);
+for y = 1:h
+    for x = 1:w
+        %select pixels from this group
+        if diff(y,x) == which_group
             diff(y,x) = 1;
         else
             diff(y,x) = 0;
         end
     end
 end
+imshow(diff);
+pause;
+
+%locate board using bg subtraction method 1:
+
+%get size
+% [hei, wid] = size(im1);
+% 
+% %prepare a results image
+% diff = zeros(hei,wid);
+% 
+% %loop from low to high threshold
+% T = 25;
+% 
+% %set a threshold
+% %T = 40;
+% 
+% %Perform subtraction with threshold
+% for y=1:1:hei
+%     for x=1:1:wid
+%         if abs(im2(y,x)-im1(y,x))>T
+%             diff(y,x) = 1;
+%         else
+%             diff(y,x) = 0;
+%         end
+%     end
+% end
 
 %clean shape
 diff = bwmorph(diff, 'close');
@@ -49,19 +99,27 @@ diff = bwmorph(diff, 'majority');
 diff = bwmorph(diff, 'hbreak',4);
 %diff = bwmorph(diff, 'thicken');
 
+diff = imfilter(diff,fspecial('gaussian',10,18));
+
 %imshow(diff);
 %pause;
 
 %Find board
-board = regionprops(diff, 'boundingbox', 'extrema');
+%board = regionprops(diff, 'boundingbox', 'extrema');
 
 %get edges of board
 border = edge(diff, 'canny');
 
+disp('showing');
+imshow(border);
+pause;
+
 %smooth edges of board??
 
 %make list of edge pixels
-list = regionprops(border,'pixellist');
+list = regionprops(border,'pixellist')
+
+list.PixelList
 
 %get ordered list of border pixels, clockwise
 olist = sortEdges2(border,list.PixelList);
@@ -74,7 +132,7 @@ cand = [];
 
 [c,d] = size(olist);
 %how long to draw the vectors for calculating angle
-k = 10;
+k = 30;
 
  imshow(border);
  hold on;
