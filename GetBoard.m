@@ -29,9 +29,10 @@ temp = zeros(hei,wid);
 %Perform subtraction with threshold
 yiq1 = rgb2ntsc(bgimage);
 yiq2 = rgb2ntsc(boardim);
-T = .05;
 
-temp = abs(yiq1(:,:,2)-yiq2(:,:,2)) + abs(yiq1(:,:,3)-yiq2(:,:,3)) > T;
+T = .07;
+
+temp = abs(yiq1(:,:,1)-yiq2(:,:,1))*0.1 + abs(yiq1(:,:,2)-yiq2(:,:,2))*.95 + abs(yiq1(:,:,3)-yiq2(:,:,3))*.98 > T;
 % 
 % for y=1:1:hei
 %     for x=1:1:wid
@@ -44,7 +45,7 @@ temp = abs(yiq1(:,:,2)-yiq2(:,:,2)) + abs(yiq1(:,:,3)-yiq2(:,:,3)) > T;
 % end
 
 imshow(temp);
-disp('showing yiq custom bg subtraction');
+% disp('showing yiq custom bg subtraction');
 pause;
 
 [diff, num] = bwlabel(temp, 8);
@@ -73,9 +74,9 @@ diff = (diff == which_group);
 %     end
 % end
 
-imshow(diff);
-disp('paused');
-pause;
+% imshow(diff);
+% disp('paused');
+% pause;
 
 %locate board using bg subtraction method 1:
 
@@ -120,10 +121,12 @@ diff = imfilter(diff,fspecial('gaussian',10,18));
 
 %get edges of board
 border = edge(diff, 'canny');
-
-disp('showing edges');
 imshow(border);
 pause;
+% 
+% disp('showing edges');
+% imshow(border);
+% pause;
 
 %smooth edges of board??
 
@@ -390,55 +393,53 @@ ord(2,1:2) = corners(find(corners(:,1) == order(2)),1:2);
 ord(3,1:2) = corners(find(corners(:,1) == order(3)),1:2);
 ord(4,1:2) = corners(find(corners(:,1) == order(4)),1:2);
 
-ord
-
 %you have four points. You need to figure out which one is which (top-left,
 %bottom-right etc) Do so using regionprops AXIS:
 
 
 
-orient = regionprops(diff,'orientation')
-horiz = [];
-
-mb1 = [0 0; 0 0; 0 0];
-for e=2:1:4
-    mb1(e-1,1) = ((-ord(e,2))-(-ord(1,2)))/(ord(e,1)-ord(1,1));
-    mb1(e-1,2) = ord(1,2) - ord(1,1)*mb1(e-1,1);
-    atand(mb1(e-1,1)/mb1(e-1,2))
-    if(atand(mb1(e-1,1)/mb1(e-1,2)) == orient.Orientation)
-        horiz = [horiz; ord(1,1:2), ord(e,1:2)];
-    end
-end
-mb1 = mb1
-horiz = horiz
-
-mb2 = [0 0; 0 0];
-for e=3:1:4
-    mb2(e-2,1) = ((-ord(e,2))-(-ord(2,2)))/(ord(e,1)-ord(2,1));
-    mb2(e-2,2) = ord(2,2) - ord(2,1)*mb2(e-2,1);
-    atand(mb2(e-2,1)/mb2(e-2,2))
-    if(atand(mb2(e-2,1)/mb2(e-2,2)) == orient.Orientation)
-        horiz = [horiz; ord(2,1:2), ord(e,1:2)];
-    end
-end
-mb2 = mb2
-horiz = horiz
-
-mb3 = [0 0];
-for e=4
-    mb3(e-3,1) = ((-ord(e,2))-(-ord(3,2)))/(ord(e,1)-ord(3,1));
-    mb3(e-3,2) = ord(3,2) - ord(3,1)*mb3(e-3,1);
-    atand(mb3(e-3,1)/mb3(e-3,2))
-    if(atand(mb3(e-3,1)/mb3(e-3,2)) == orient.Orientation)
-        horiz = [horiz; ord(3,1:2), ord(e,1:2)];
-    end
-end
-mb3 = mb3
-horiz = horiz
-
-%find least steep slopes
-locmins = [find(min((mb1(:,1).^2))); find(min((mb2(:,1)).^2)); find(min((mb3(:,1)).^2))]
-mins = [mb1(locmins,1); mb2(locmins,1); mb3(locmins,1)]
+% orient = regionprops(diff,'orientation')
+% horiz = [];
+% 
+% mb1 = [0 0; 0 0; 0 0];
+% for e=2:1:4
+%     mb1(e-1,1) = ((-ord(e,2))-(-ord(1,2)))/(ord(e,1)-ord(1,1));
+%     mb1(e-1,2) = ord(1,2) - ord(1,1)*mb1(e-1,1);
+%     atand(mb1(e-1,1)/mb1(e-1,2))
+%     if(atand(mb1(e-1,1)/mb1(e-1,2)) == orient.Orientation)
+%         horiz = [horiz; ord(1,1:2), ord(e,1:2)];
+%     end
+% end
+% mb1 = mb1
+% horiz = horiz
+% 
+% mb2 = [0 0; 0 0];
+% for e=3:1:4
+%     mb2(e-2,1) = ((-ord(e,2))-(-ord(2,2)))/(ord(e,1)-ord(2,1));
+%     mb2(e-2,2) = ord(2,2) - ord(2,1)*mb2(e-2,1);
+%     atand(mb2(e-2,1)/mb2(e-2,2))
+%     if(atand(mb2(e-2,1)/mb2(e-2,2)) == orient.Orientation)
+%         horiz = [horiz; ord(2,1:2), ord(e,1:2)];
+%     end
+% end
+% mb2 = mb2
+% horiz = horiz
+% 
+% mb3 = [0 0];
+% for e=4
+%     mb3(e-3,1) = ((-ord(e,2))-(-ord(3,2)))/(ord(e,1)-ord(3,1));
+%     mb3(e-3,2) = ord(3,2) - ord(3,1)*mb3(e-3,1);
+%     atand(mb3(e-3,1)/mb3(e-3,2))
+%     if(atand(mb3(e-3,1)/mb3(e-3,2)) == orient.Orientation)
+%         horiz = [horiz; ord(3,1:2), ord(e,1:2)];
+%     end
+% end
+% mb3 = mb3
+% horiz = horiz
+% 
+% %find least steep slopes
+% locmins = [find(min((mb1(:,1).^2))); find(min((mb2(:,1)).^2)); find(min((mb3(:,1)).^2))]
+% mins = [mb1(locmins,1); mb2(locmins,1); mb3(locmins,1)]
 
 
 %calculate slope for each pair
@@ -447,7 +448,7 @@ mins = [mb1(locmins,1); mb2(locmins,1); mb3(locmins,1)]
 temp = [temp; ((-ord(2,2))-(-ord(1,2)))/(ord(2,1)-ord(1,1))];
 temp = [temp; ((-ord(3,2))-(-ord(2,2)))/(ord(3,1)-ord(2,1))];
 temp = [temp; ((-ord(4,2))-(-ord(1,2)))/(ord(4,1)-ord(1,1))];
-temp = [temp; ((-ord(4,2))-(-ord(3,2)))/(ord(4,1)-ord(3,1))]
+temp = [temp; ((-ord(4,2))-(-ord(3,2)))/(ord(4,1)-ord(3,1))];
 
 %TODO - sort by least slope. The two least are the front and back of the board.
 
@@ -461,13 +462,13 @@ ord2(4,1:2) = corners(find(corners(:,2) == order2(4)),1:2);
 
 
 %calculate y-intercept
-b1 = -ord(1,2) - temp(1)*ord(1,1)
-b2 = -ord(2,2) - temp(2)*ord(2,1)
-b3 = -ord(1,2) - temp(3)*ord(1,1)
-b4 = -ord(3,2) - temp(4)*ord(3,1)
+b1 = -ord(1,2) - temp(1)*ord(1,1);
+b2 = -ord(2,2) - temp(2)*ord(2,1);
+b3 = -ord(1,2) - temp(3)*ord(1,1);
+b4 = -ord(3,2) - temp(4)*ord(3,1);
 
 %format bank
-lines = [temp(1), b1; temp(2),b2; temp(3),b3; temp(4),b4]
+lines = [temp(1), b1; temp(2),b2; temp(3),b3; temp(4),b4];
 
 temp = [];
 b = [];
