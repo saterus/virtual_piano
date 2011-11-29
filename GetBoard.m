@@ -130,6 +130,8 @@ pause;
 
 %smooth edges of board??
 
+
+
 %make list of edge pixels
 list = regionprops(border,'pixellist');
 
