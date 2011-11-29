@@ -6,11 +6,12 @@ function [ v ] = keyFromPoints( points )
 global data keyLines;
 
 v = [];
-
+hold on;
 for i = 1:size(points, 1)
     
     points1 = points(i,:);
     points1= [points1(1), -points1(2)];
+    plot(points(i,1),points(i,2),'g*');
     
     if(((data(2,1)*points1(1) + data(2,2)) > points1(2)) && ((data(3,1)*points1(1) + data(3,2)) < points1(2)) && (((points1(2)-data(1,2))/data(1,1)) < points1(1)) && (((points1(2)-data(3,2))/data(3,1)) > points1(1)))
         sprintf('Point (%d, %d) inside bounds\n',points1(1), points1(2))
@@ -44,3 +45,4 @@ for i = 1:size(points, 1)
 
 end
 
+hold off;

@@ -26,9 +26,11 @@ end
 
 %prepare a results image
 temp = zeros(hei,wid);
+%Perform subtraction with threshold
 yiq1 = rgb2ntsc(bgimage);
 yiq2 = rgb2ntsc(boardim);
 T = .05;
+
 for y=1:1:hei
     for x=1:1:wid
         if abs(yiq1(y,x,2)-yiq2(y,x,2)) + abs(yiq1(y,x,3)-yiq2(y,x,3)) > T
@@ -94,10 +96,12 @@ pause;
 % end
 
 %clean shape
+
 diff = bwmorph(diff, 'close');
 diff = bwmorph(diff, 'majority');
 diff = bwmorph(diff, 'hbreak',4);
 %diff = bwmorph(diff, 'thicken');
+diff = bwareaopen(diff,10000);
 
 diff = imfilter(diff,fspecial('gaussian',10,18));
 
@@ -120,7 +124,8 @@ pause;
 list = regionprops(border,'pixellist');
 
 %get ordered list of border pixels, clockwise
-olist = sortEdges2(border,list.PixelList);
+temp = list(1);
+olist = sortEdges2(border,temp.PixelList);
 
 %prepare a short list of corner candidates
 cand = [];
@@ -356,7 +361,6 @@ plot(corners(1,1),corners(1,2),'b*');
 plot(corners(2,1),corners(2,2),'b*');
 plot(corners(3,1),corners(3,2),'b*');
 plot(corners(4,1),corners(4,2),'b*');
-hold off
 disp('Corner pixels have been found. Press ENTER.');
 %pause;
 
@@ -472,6 +476,11 @@ end
 
 %format bank
 keyLines = [temp(1), b(1); temp(2),b(2); temp(3),b(3); temp(4),b(4); temp(5),b(5); temp(6),b(6)];
+
+for i=1:6
+    plot([keyPointsBottom(i,1), keyPointsTop(i,1)], [keyPointsBottom(i,2), keyPointsTop(i,2)]);
+end
+hold off
 
 %TODO - write equation for each verticle line
 
