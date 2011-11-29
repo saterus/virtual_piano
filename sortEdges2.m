@@ -17,9 +17,9 @@ point = pixellist(1,:);
 
 %grab the eight neighbors' coordinants
 nebs = [point(1)-1,point(2)-1;point(1),point(2)-1;point(1)+1,point(2)-1;point(1)-1,point(2);point(1)+1,point(2);point(1)-1,point(2)+1;point(1),point(2)+1;point(1)+1,point(2)+1];
-
+hold off;
 imshow(image);
-hold on
+hold on;
 plot(point(1),point(2),'b+');
 
 sortedlist(1,1:2) = point;

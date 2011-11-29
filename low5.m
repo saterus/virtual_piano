@@ -16,6 +16,8 @@ im = hand;
 %pause;
 
 %get edges of board
+
+im = bwmorph(im, 'dilate');
 border = edge(im, 'canny');
 
 
@@ -23,9 +25,26 @@ border2 = bwmorph(border,'thin');
 %imshow(border2);
 %pause;
 
-%make list of edge pixels
-list = regionprops(border2,'pixellist');
 %get ordered list of border pixels, clockwise
+
+%border = bwareaopen(border,100);
+%make list of edge pixels
+border2 = bwmorph(border2, 'bridge');
+border2 = bwmorph(border2, 'shrink');
+
+list = regionprops(border2,'pixellist');
+
+max = 0;
+for i=1:size(list)
+    temp = list(i,1);
+    temp = temp.PixelList;
+    if(size(temp,1)>max)
+        max = size(temp,1);
+    end
+end
+
+border2 = bwareaopen(border2, max);
+list = regionprops(border2,'pixellist');
 olist = sortEdges2(border2,list.PixelList);
 
 %prepare a short list of corner candidates

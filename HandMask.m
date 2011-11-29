@@ -1,10 +1,11 @@
-function [] = HandMask(bg, u, path)
+function [] = HandMask(bg, path)
 global img chan_diff chan_diff_mask filtered;
 
 % Original Image
 fprintf('Path: %s\n', path);
 img = double( imread(path) );
 subplot(3,2,1);
+
 imshow(uint8(img));
 
 % Take Color Channel Differences of Original Images
@@ -28,6 +29,21 @@ filtered = medfilt2(filtered, [8 8]);
 
 % Show the LOG Filter
 subplot(3,2,3);
+
+%Perform subtraction with threshold
+
+% [hei, wid] = size(filtered);
+% T = 1.25*mean2(filtered);
+% 
+% for y=1:1:hei
+%     for x=1:1:wid
+%         if filtered(y,x) > T
+%             filtered(y,x) = 1;
+%         else
+%             filtered(y,x) = 0;
+%         end
+%     end
+% end
 imshow(filtered);
 
 % Combine the Channel Difference and the LOG Filter
@@ -42,7 +58,7 @@ chan_diff_mask = chan_diff > 0.06;
 chan_diff_mask = bwmorph(chan_diff_mask, 'dilate');
 chan_diff_mask = bwmorph(chan_diff_mask, 'close',Inf);
 [labeled, num] = bwlabel(chan_diff_mask, 8);
-chan_diff_mask = bwareaopen(labeled, 1000);
+chan_diff_mask = bwareaopen(labeled, 10000);
 imshow(chan_diff_mask);
 
 % Mask Overlay on the faint Image

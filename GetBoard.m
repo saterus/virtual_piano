@@ -1,4 +1,4 @@
-function [keys, keyLines] = GetBoard( bgimage, boardim )
+function [keys, keyLines, boardMask] = GetBoard( bgimage, boardim )
 %GETBOARD Locates the paper keyboard and keys
 %   Takes in a bg image without the keyboard
 %   followed by an image with the keyboard
@@ -112,7 +112,7 @@ diff = bwmorph(diff, 'hbreak',4);
 diff = bwareaopen(diff,10000);
 
 diff = imfilter(diff,fspecial('gaussian',10,18));
-
+boardMask = (diff - 1) * -1;
 %imshow(diff);
 %pause;
 
