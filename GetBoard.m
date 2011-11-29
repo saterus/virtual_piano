@@ -13,11 +13,11 @@ function [keys, keyLines] = GetBoard( bgimage, boardim )
 %covert rgb to grey
 [h, w, d] = size(bgimage);
 if(d > 0)
-    disp('is rgb');
+    %disp('is rgb');
     im1 = double(rgb2gray(bgimage));
     im2 = double(rgb2gray(boardim));
 else
-    disp('is not rgb');
+    %disp('is not rgb');
     im1 = double(bgimage);
     im2 = double(boardim);
 end
@@ -25,28 +25,32 @@ end
 [hei, wid] = size(im1);
 
 %prepare a results image
-diff = zeros(hei,wid);
+temp = zeros(hei,wid);
 %Perform subtraction with threshold
 yiq1 = rgb2ntsc(bgimage);
 yiq2 = rgb2ntsc(boardim);
-T = .05;
 
-for y=1:1:hei
-    for x=1:1:wid
-        if abs(yiq1(y,x,2)-yiq2(y,x,2)) + abs(yiq1(y,x,3)-yiq2(y,x,3)) > T
-            temp(y,x) = 1;
-        else
-            temp(y,x) = 0;
-        end
-    end
-end
+T = .07;
+
+temp = abs(yiq1(:,:,1)-yiq2(:,:,1))*0.1 + abs(yiq1(:,:,2)-yiq2(:,:,2))*.95 + abs(yiq1(:,:,3)-yiq2(:,:,3))*.98 > T;
+% 
+% for y=1:1:hei
+%     for x=1:1:wid
+%         if abs(yiq1(y,x,2)-yiq2(y,x,2)) + abs(yiq1(y,x,3)-yiq2(y,x,3)) > T
+%             temp(y,x) = 1;
+%         else
+%             temp(y,x) = 0;
+%         end
+%     end
+% end
+
 imshow(temp);
-disp('temp');
+% disp('showing yiq custom bg subtraction');
 pause;
 
 [diff, num] = bwlabel(temp, 8);
 %determine number of groups
-maxim = max(max(diff))
+maxim = max(max(diff));
 
 for i = 1: 1 : maxim
     %count members in each group
@@ -54,21 +58,25 @@ for i = 1: 1 : maxim
 end
 
 %select largest group
-most_members = max(loc)
-which_group = find(loc == most_members)
-[h,w] = size(diff);
-for y = 1:h
-    for x = 1:w
-        %select pixels from this group
-        if diff(y,x) == which_group
-            diff(y,x) = 1;
-        else
-            diff(y,x) = 0;
-        end
-    end
-end
-imshow(diff);
-pause;
+most_members = max(loc);
+which_group = find(loc == most_members);
+
+diff = (diff == which_group);
+% [h,w] = size(diff);
+% for y = 1:h
+%     for x = 1:w
+%         %select pixels from this group
+%         if diff(y,x) == which_group
+%             diff(y,x) = 1;
+%         else
+%             diff(y,x) = 0;
+%         end
+%     end
+% end
+
+% imshow(diff);
+% disp('paused');
+% pause;
 
 %locate board using bg subtraction method 1:
 
@@ -113,15 +121,17 @@ diff = imfilter(diff,fspecial('gaussian',10,18));
 
 %get edges of board
 border = edge(diff, 'canny');
-
-disp('showing');
 imshow(border);
 pause;
+% 
+% disp('showing edges');
+% imshow(border);
+% pause;
 
 %smooth edges of board??
 
 %make list of edge pixels
-list = regionprops(border,'pixellist')
+list = regionprops(border,'pixellist');
 
 %get ordered list of border pixels, clockwise
 temp = list(1);
@@ -159,7 +169,7 @@ for q = (k+1) : 1 : (c-k)
     %theta = acos(dot(p1,p3)/(sqrt(sum(p1.^2))+sqrt(sum(p3.^2))));
 
     %find corners within about 60 to 130 degrees (corners of board)
-    if (real(theta) < (130*(pi/180))) && (real(theta) > (50*(pi/180)))
+    if (real(theta) < (130*(pi/180))) && (real(theta) > (40*(pi/180)))
 
         %we have a corner
 
@@ -193,7 +203,7 @@ for q = 1:1:k
     %theta = acos(dot(p1,p3)/(sqrt(sum(p1.^2))+sqrt(sum(p3.^2))));
 
     %find corners within about 60 to 130 degrees (corners of board)
-    if (real(theta) < (130*(pi/180))) && (real(theta) > (50*(pi/180)))
+    if (real(theta) < (130*(pi/180))) && (real(theta) > (40*(pi/180)))
 
         %we have a corner
 
@@ -228,7 +238,7 @@ for q = c-k:1:c
     %theta = acos(dot(p1,p3)/(sqrt(sum(p1.^2))+sqrt(sum(p3.^2))));
 
     %find corners within about 60 to 130 degrees (corners of board)
-    if (real(theta) < (130*(pi/180))) && (real(theta) > (50*(pi/180)))
+    if (real(theta) < (130*(pi/180))) && (real(theta) > (40*(pi/180)))
 
         %we have a corner
 
@@ -274,7 +284,7 @@ for e = 1:1:no(1)
 
             %magical number 10
             %if the candidate is close to bin h's average, enter it
-            if(sqrt(sum((can(1,1:2) - avgs(h,1:2)).^2)) < 10)
+            if(sqrt(sum((can(1,1:2) - avgs(h,1:2)).^2)) < 30)
                 %it fits in the h-th bin
 
 %                 tmp(1:nums(h),1:3) = bins(h,1:nums(h),1:3)
@@ -353,7 +363,7 @@ av2(1,1:2) = c2(fc2(1),1:2);
 av3(1,1:2) = c3(fc3(1),1:2);
 av4(1,1:2) = c4(fc4(1),1:2);
 
-corners = [av1;av2;av3;av4]
+corners = [av1;av2;av3;av4];
 
 imshow(border);
 hold on
@@ -374,6 +384,8 @@ lines = [];
 temp = [];
 
 
+
+
 %sort points left to right (or by increasing x)
 order = sort(corners(:,1));
 ord(1,1:2) = corners(find(corners(:,1) == order(1)),1:2);
@@ -381,13 +393,62 @@ ord(2,1:2) = corners(find(corners(:,1) == order(2)),1:2);
 ord(3,1:2) = corners(find(corners(:,1) == order(3)),1:2);
 ord(4,1:2) = corners(find(corners(:,1) == order(4)),1:2);
 
+%you have four points. You need to figure out which one is which (top-left,
+%bottom-right etc) Do so using regionprops AXIS:
+
+
+
+% orient = regionprops(diff,'orientation')
+% horiz = [];
+% 
+% mb1 = [0 0; 0 0; 0 0];
+% for e=2:1:4
+%     mb1(e-1,1) = ((-ord(e,2))-(-ord(1,2)))/(ord(e,1)-ord(1,1));
+%     mb1(e-1,2) = ord(1,2) - ord(1,1)*mb1(e-1,1);
+%     atand(mb1(e-1,1)/mb1(e-1,2))
+%     if(atand(mb1(e-1,1)/mb1(e-1,2)) == orient.Orientation)
+%         horiz = [horiz; ord(1,1:2), ord(e,1:2)];
+%     end
+% end
+% mb1 = mb1
+% horiz = horiz
+% 
+% mb2 = [0 0; 0 0];
+% for e=3:1:4
+%     mb2(e-2,1) = ((-ord(e,2))-(-ord(2,2)))/(ord(e,1)-ord(2,1));
+%     mb2(e-2,2) = ord(2,2) - ord(2,1)*mb2(e-2,1);
+%     atand(mb2(e-2,1)/mb2(e-2,2))
+%     if(atand(mb2(e-2,1)/mb2(e-2,2)) == orient.Orientation)
+%         horiz = [horiz; ord(2,1:2), ord(e,1:2)];
+%     end
+% end
+% mb2 = mb2
+% horiz = horiz
+% 
+% mb3 = [0 0];
+% for e=4
+%     mb3(e-3,1) = ((-ord(e,2))-(-ord(3,2)))/(ord(e,1)-ord(3,1));
+%     mb3(e-3,2) = ord(3,2) - ord(3,1)*mb3(e-3,1);
+%     atand(mb3(e-3,1)/mb3(e-3,2))
+%     if(atand(mb3(e-3,1)/mb3(e-3,2)) == orient.Orientation)
+%         horiz = [horiz; ord(3,1:2), ord(e,1:2)];
+%     end
+% end
+% mb3 = mb3
+% horiz = horiz
+% 
+% %find least steep slopes
+% locmins = [find(min((mb1(:,1).^2))); find(min((mb2(:,1)).^2)); find(min((mb3(:,1)).^2))]
+% mins = [mb1(locmins,1); mb2(locmins,1); mb3(locmins,1)]
+
+
 %calculate slope for each pair
 %I put minus signs before the y's so that the slope would mach that shown
 %on the screen (images use increasing y going down, vs cartesian method)
 temp = [temp; ((-ord(2,2))-(-ord(1,2)))/(ord(2,1)-ord(1,1))];
 temp = [temp; ((-ord(3,2))-(-ord(2,2)))/(ord(3,1)-ord(2,1))];
 temp = [temp; ((-ord(4,2))-(-ord(1,2)))/(ord(4,1)-ord(1,1))];
-temp = [temp; ((-ord(4,2))-(-ord(3,2)))/(ord(4,1)-ord(3,1))]
+temp = [temp; ((-ord(4,2))-(-ord(3,2)))/(ord(4,1)-ord(3,1))];
 
 %TODO - sort by least slope. The two least are the front and back of the board.
 
@@ -407,7 +468,7 @@ b3 = -ord(1,2) - temp(3)*ord(1,1);
 b4 = -ord(3,2) - temp(4)*ord(3,1);
 
 %format bank
-lines = [temp(1), b1; temp(2),b2; temp(3),b3; temp(4),b4]
+lines = [temp(1), b1; temp(2),b2; temp(3),b3; temp(4),b4];
 
 temp = [];
 b = [];
