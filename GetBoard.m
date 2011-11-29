@@ -13,11 +13,11 @@ function [keys, keyLines] = GetBoard( bgimage, boardim )
 %covert rgb to grey
 [h, w, d] = size(bgimage);
 if(d > 0)
-    disp('is rgb');
+    %disp('is rgb');
     im1 = double(rgb2gray(bgimage));
     im2 = double(rgb2gray(boardim));
 else
-    disp('is not rgb');
+    %disp('is not rgb');
     im1 = double(bgimage);
     im2 = double(boardim);
 end
@@ -25,7 +25,7 @@ end
 [hei, wid] = size(im1);
 
 %prepare a results image
-diff = zeros(hei,wid);
+temp = zeros(hei,wid);
 yiq1 = rgb2ntsc(bgimage);
 yiq2 = rgb2ntsc(boardim);
 T = .05;
@@ -39,12 +39,12 @@ for y=1:1:hei
     end
 end
 imshow(temp);
-disp('temp');
+disp('showing yiq custom bg subtraction');
 pause;
 
 [diff, num] = bwlabel(temp, 8);
 %determine number of groups
-maxim = max(max(diff))
+maxim = max(max(diff));
 
 for i = 1: 1 : maxim
     %count members in each group
@@ -52,8 +52,8 @@ for i = 1: 1 : maxim
 end
 
 %select largest group
-most_members = max(loc)
-which_group = find(loc == most_members)
+most_members = max(loc);
+which_group = find(loc == most_members);
 [h,w] = size(diff);
 for y = 1:h
     for x = 1:w
@@ -110,16 +110,14 @@ diff = imfilter(diff,fspecial('gaussian',10,18));
 %get edges of board
 border = edge(diff, 'canny');
 
-disp('showing');
+disp('showing edges');
 imshow(border);
 pause;
 
 %smooth edges of board??
 
 %make list of edge pixels
-list = regionprops(border,'pixellist')
-
-list.PixelList
+list = regionprops(border,'pixellist');
 
 %get ordered list of border pixels, clockwise
 olist = sortEdges2(border,list.PixelList);
@@ -271,7 +269,7 @@ for e = 1:1:no(1)
 
             %magical number 10
             %if the candidate is close to bin h's average, enter it
-            if(sqrt(sum((can(1,1:2) - avgs(h,1:2)).^2)) < 10)
+            if(sqrt(sum((can(1,1:2) - avgs(h,1:2)).^2)) < 30)
                 %it fits in the h-th bin
 
 %                 tmp(1:nums(h),1:3) = bins(h,1:nums(h),1:3)
@@ -350,7 +348,7 @@ av2(1,1:2) = c2(fc2(1),1:2);
 av3(1,1:2) = c3(fc3(1),1:2);
 av4(1,1:2) = c4(fc4(1),1:2);
 
-corners = [av1;av2;av3;av4]
+corners = [av1;av2;av3;av4];
 
 imshow(border);
 hold on
@@ -372,12 +370,65 @@ lines = [];
 temp = [];
 
 
+
+
 %sort points left to right (or by increasing x)
 order = sort(corners(:,1));
 ord(1,1:2) = corners(find(corners(:,1) == order(1)),1:2);
 ord(2,1:2) = corners(find(corners(:,1) == order(2)),1:2);
 ord(3,1:2) = corners(find(corners(:,1) == order(3)),1:2);
 ord(4,1:2) = corners(find(corners(:,1) == order(4)),1:2);
+
+ord
+
+%you have four points. You need to figure out which one is which (top-left,
+%bottom-right etc) Do so using regionprops AXIS:
+
+
+
+orient = regionprops(diff,'orientation')
+horiz = [];
+
+mb1 = [0 0; 0 0; 0 0];
+for e=2:1:4
+    mb1(e-1,1) = ((-ord(e,2))-(-ord(1,2)))/(ord(e,1)-ord(1,1));
+    mb1(e-1,2) = ord(1,2) - ord(1,1)*mb1(e-1,1);
+    atand(mb1(e-1,1)/mb1(e-1,2))
+    if(atand(mb1(e-1,1)/mb1(e-1,2)) == orient.Orientation)
+        horiz = [horiz; ord(1,1:2), ord(e,1:2)];
+    end
+end
+mb1 = mb1
+horiz = horiz
+
+mb2 = [0 0; 0 0];
+for e=3:1:4
+    mb2(e-2,1) = ((-ord(e,2))-(-ord(2,2)))/(ord(e,1)-ord(2,1));
+    mb2(e-2,2) = ord(2,2) - ord(2,1)*mb2(e-2,1);
+    atand(mb2(e-2,1)/mb2(e-2,2))
+    if(atand(mb2(e-2,1)/mb2(e-2,2)) == orient.Orientation)
+        horiz = [horiz; ord(2,1:2), ord(e,1:2)];
+    end
+end
+mb2 = mb2
+horiz = horiz
+
+mb3 = [0 0];
+for e=4
+    mb3(e-3,1) = ((-ord(e,2))-(-ord(3,2)))/(ord(e,1)-ord(3,1));
+    mb3(e-3,2) = ord(3,2) - ord(3,1)*mb3(e-3,1);
+    atand(mb3(e-3,1)/mb3(e-3,2))
+    if(atand(mb3(e-3,1)/mb3(e-3,2)) == orient.Orientation)
+        horiz = [horiz; ord(3,1:2), ord(e,1:2)];
+    end
+end
+mb3 = mb3
+horiz = horiz
+
+%find least steep slopes
+locmins = [find(min((mb1(:,1).^2))); find(min((mb2(:,1)).^2)); find(min((mb3(:,1)).^2))]
+mins = [mb1(locmins,1); mb2(locmins,1); mb3(locmins,1)]
+
 
 %calculate slope for each pair
 %I put minus signs before the y's so that the slope would mach that shown
